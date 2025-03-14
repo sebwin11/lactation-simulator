@@ -1,0 +1,64 @@
+body {
+    background-color: #f8f9fa;
+    padding: 20px;
+}
+
+.card {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+.card-header {
+    background-color: #007bff;
+    color: white;
+}
+
+.chart-container {
+    position: relative;
+    height: 300px;
+    width: 100%;
+}
+
+table td[contenteditable="true"] {
+    background-color: #fff;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+table td[contenteditable="true"]:hover {
+    background-color: #f0f0f0;
+}
+
+table td[contenteditable="true"]:focus {
+    background-color: #e8f0fe;
+    outline: 2px solid #007bff;
+    outline-offset: -2px;
+}
+
+.table th {
+    background-color: #f8f9fa;
+}
+
+h3 {
+    color: #495057;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+}
+
+.scenario {
+    padding: 15px;
+}
+
+@media (max-width: 768px) {
+    .container-fluid {
+        padding: 10px;
+    }
+    
+    .table-responsive {
+        margin-bottom: 1rem;
+    }
+    
+    .chart-container {
+        height: 250px;
+    }
+} 

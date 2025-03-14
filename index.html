@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulateur de Production Laitière</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="styles.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container-fluid">
+        <h1 class="text-center my-4">Simulateur de Production Laitière</h1>
+        
+        <div class="row">
+            <!-- Scénario 1 -->
+            <div class="col-md-6 scenario">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Scénario 1</h2>
+                    </div>
+                    <div class="card-body">
+                        <!-- Informations de production -->
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title">Informations de production</h5>
+                                <div class="table-responsive">
+                                    <table class="table table-bordered">
+                                        <tbody>
+                                            <tr>
+                                                <td>Production par VL/an (L)</td>
+                                                <td id="productionParVL1">0</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Production génisses (VL 1ère lactation)</td>
+                                                <td id="productionGenisses1">0</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Production vaches (VL 2 lactations et +)</td>
+                                                <td id="productionVaches1">0</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Paramètres de configuration -->
+                        <div class="config-section mb-4">
+                            <h3>Configuration</h3>
+                            <form id="config1" class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Production totale (L/an)</label>
+                                    <input type="number" class="form-control" name="production_tot" value="800000">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Nombre de VL trayantes</label>
+                                    <input type="number" class="form-control" name="VL_count" value="100">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">IVV (jours)</label>
+                                    <input type="number" class="form-control" name="IVV" value="365">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Durée de tarissement (jours)</label>
+                                    <input type="number" class="form-control" name="tarissement" value="60">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Production génisses (% de la prod VL)</label>
+                                    <input type="number" class="form-control" name="primipare_factor" value="85">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Taux de renouvellement (%)</label>
+                                    <input type="number" class="form-control" name="renewal" value="30">
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label">Profil de production</label>
+                                    <select class="form-select" name="profile">
+                                        <option value="Nourrir pour produire">Nourrir pour produire</option>
+                                        <option value="Alimentation par palier">Alimentation par palier</option>
+                                        <option value="Production lissée">Production lissée</option>
+                                        <option value="Ration totale mélangée">Ration totale mélangée</option>
+                                        <option value="Traite 3x/jour">Traite 3x/jour</option>
+                                        <option value="Une traite / jour">Une traite / jour</option>
+                                        <option value="Bloc de printemps">Bloc de printemps</option>
+                                        <option value="Bloc d'automne">Bloc d'automne</option>
+                                    </select>
+                                    <div class="alert alert-info mt-2">
+                                        <strong>Description du profil :</strong>
+                                        <p id="profileDescription1" class="mb-0"></p>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Courbe de lactation -->
+                        <div class="chart-container">
+                            <canvas id="lactationChart1"></canvas>
+                        </div>
+
+                        <!-- Tableau des données de lactation -->
+                        <div class="table-responsive mt-4">
+                            <h3>Données de Lactation (L/jour)</h3>
+                            <table class="table table-bordered" id="lactationDataTable1">
+                                <thead>
+                                    <tr>
+                                        <th>Type</th>
+                                        <th>1</th><th>2</th><th>3</th><th>4</th>
+                                        <th>5</th><th>6</th><th>7</th><th>8</th>
+                                        <th>9</th><th>10</th><th>11</th><th>12</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr id="lactationVache1">
+                                        <td>Vache</td>
+                                        <td>0</td><td>0</td><td>0</td><td>0</td>
+                                        <td>0</td><td>0</td><td>0</td><td>0</td>
+                                        <td>0</td><td>0</td><td>0</td><td>0</td>
+                                    </tr>
+                                    <tr id="lactationGenisse1">
+                                        <td>Génisse</td>
+                                        <td>0</td><td>0</td><td>0</td><td>0</td>
+                                        <td>0</td><td>0</td><td>0</td><td>0</td>
+                                        <td>0</td><td>0</td><td>0</td><td>0</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Répartition des vêlages -->
+                        <div class="table-responsive mt-4">
+                            <h3>Répartition des Vêlages</h3>
+                            <p class="text-muted" id="repartitionInfo1">Veuillez répartir les vêlages selon le taux de renouvellement.</p>
+                            <table class="table table-bordered" id="velageTable1">
+                                <thead>
+                                    <tr>
+                                        <th>Mois</th>
+                                        <th>1</th><th>2</th><th>3</th><th>4</th>
+                                        <th>5</th><th>6</th><th>7</th><th>8</th>
+                                        <th>9</th><th>10</th><th>11</th><th>12</th>
+                                        <th>Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr id="vaches1">
+                                        <td>Vaches</td>
+                                        <td contenteditable="true">0</td>
+                                        <td contenteditable="true">0</td>
+                                        <td contenteditable="true">0</td>
+                                        <td contenteditable="true">0</td>
+                                        <td contenteditable="true">0</td>
+                                        <td contenteditable="true">0</td>
+                                        <td contenteditable="true">0</td>
+                                        <td contenteditable="true">0</td>
+                                        <td contenteditable="true">0</td>
+                                        <td contenteditable="true">0</td>
+                                        <td contenteditable="true">0</td>
+                                        <td contenteditable="true">0</td>
+                                        <td id="totalVaches1">0</td>
+                                    </tr>
+                                    <tr id="genisses1">
+                                        <td>Génisses</td>
+                                        <td contenteditable="true">0</td>
+                                        <td contenteditable="true">0</td>
+                                        <td contenteditable="true">0</td>
+                                        <td contenteditable="true">0</td>
+                                        <td contenteditable="true">0</td>
+                                        <td contenteditable="true">0</td>
+                                        <td contenteditable="true">0</td>
+                                        <td contenteditable="true">0</td>
+                                        <td contenteditable="true">0</td>
+                                        <td contenteditable="true">0</td>
+                                        <td contenteditable="true">0</td>
+                                        <td contenteditable="true">0</td>
+                                        <td id="totalGenisses1">0</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Courbe de production globale -->
+                        <div class="chart-container mt-4">
+                            <canvas id="globalProductionChart1"></canvas>
+                        </div>
+
+                        <!-- Production mensuelle -->
+                        <div class="table-responsive mt-4">
+                            <h3>Production Mensuelle (milliers de L)</h3>
+                            <table class="table table-bordered" id="productionTable1">
+                                <thead>
+                                    <tr>
+                                        <th>Mois</th>
+                                        <th>1</th><th>2</th><th>3</th><th>4</th>
+                                        <th>5</th><th>6</th><th>7</th><th>8</th>
+                                        <th>9</th><th>10</th><th>11</th><th>12</th>
+                                        <th>Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr id="litres1">
+                                        <td>Litres</td>
+                                        <td>0</td><td>0</td><td>0</td><td>0</td>
+                                        <td>0</td><td>0</td><td>0</td><td>0</td>
+                                        <td>0</td><td>0</td><td>0</td><td>0</td>
+                                        <td id="totalLitres1">0</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Prix du lait -->
+                        <div class="table-responsive mt-4">
+                            <h3>Prix du Lait (€/1000L)</h3>
+                            <table class="table table-bordered" id="priceTable1">
+                                <thead>
+                                    <tr>
+                                        <th>Mois</th>
+                                        <th>1</th><th>2</th><th>3</th><th>4</th>
+                                        <th>5</th><th>6</th><th>7</th><th>8</th>
+                                        <th>9</th><th>10</th><th>11</th><th>12</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr id="prices1">
+                                        <td>Prix</td>
+                                        <td contenteditable="true">400</td>
+                                        <td contenteditable="true">400</td>
+                                        <td contenteditable="true">400</td>
+                                        <td contenteditable="true">400</td>
+                                        <td contenteditable="true">400</td>
+                                        <td contenteditable="true">400</td>
+                                        <td contenteditable="true">400</td>
+                                        <td contenteditable="true">400</td>
+                                        <td contenteditable="true">400</td>
+                                        <td contenteditable="true">400</td>
+                                        <td contenteditable="true">400</td>
+                                        <td contenteditable="true">400</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Chiffre d'affaires -->
+                        <div class="chart-container mt-4">
+                            <canvas id="revenueChart1"></canvas>
+                        </div>
+
+                        <!-- Tableau du chiffre d'affaires -->
+                        <div class="table-responsive mt-4">
+                            <h3>Chiffre d'affaires (k€)</h3>
+                            <table class="table table-bordered" id="revenueTable1">
+                                <thead>
+                                    <tr>
+                                        <th>Mois</th>
+                                        <th>1</th><th>2</th><th>3</th><th>4</th>
+                                        <th>5</th><th>6</th><th>7</th><th>8</th>
+                                        <th>9</th><th>10</th><th>11</th><th>12</th>
+                                        <th>Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr id="revenue1">
+                                        <td>CA</td>
+                                        <td>0</td><td>0</td><td>0</td><td>0</td>
+                                        <td>0</td><td>0</td><td>0</td><td>0</td>
+                                        <td>0</td><td>0</td><td>0</td><td>0</td>
+                                        <td id="totalRevenue1">0</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Scénario 2 -->
+            <div class="col-md-6 scenario">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Scénario 2</h2>
+                    </div>
+                    <div class="card-body">
+                        <!-- Informations de production -->
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title">Informations de production</h5>
+                                <div class="table-responsive">
+                                    <table class="table table-bordered">
+                                        <tbody>
+                                            <tr>
+                                                <td>Production par VL/an (L)</td>
+                                                <td id="productionParVL2">0</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Production génisses (VL 1ère lactation)</td>
+                                                <td id="productionGenisses2">0</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Production vaches (VL 2 lactations et +)</td>
+                                                <td id="productionVaches2">0</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Paramètres de configuration -->
+                        <div class="config-section mb-4">
+                            <h3>Configuration</h3>
+                            <form id="config2" class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Production totale (L/an)</label>
+                                    <input type="number" class="form-control" name="production_tot" value="800000">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Nombre de VL trayantes</label>
+                                    <input type="number" class="form-control" name="VL_count" value="100">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">IVV (jours)</label>
+                                    <input type="number" class="form-control" name="IVV" value="365">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Durée de tarissement (jours)</label>
+                                    <input type="number" class="form-control" name="tarissement" value="60">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Production génisses (% de la prod VL)</label>
+                                    <input type="number" class="form-control" name="primipare_factor" value="85">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Taux de renouvellement (%)</label>
+                                    <input type="number" class="form-control" name="renewal" value="30">
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label">Profil de production</label>
+                                    <select class="form-select" name="profile">
+                                        <option value="Nourrir pour produire">Nourrir pour produire</option>
+                                        <option value="Alimentation par palier">Alimentation par palier</option>
+                                        <option value="Production lissée">Production lissée</option>
+                                        <option value="Ration totale mélangée">Ration totale mélangée</option>
+                                        <option value="Traite 3x/jour">Traite 3x/jour</option>
+                                        <option value="Une traite / jour">Une traite / jour</option>
+                                        <option value="Bloc de printemps">Bloc de printemps</option>
+                                        <option value="Bloc d'automne">Bloc d'automne</option>
+                                    </select>
+                                    <div class="alert alert-info mt-2">
+                                        <strong>Description du profil :</strong>
+                                        <p id="profileDescription2" class="mb-0"></p>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Courbe de lactation -->
+                        <div class="chart-container">
+                            <canvas id="lactationChart2"></canvas>
+                        </div>
+
+                        <!-- Tableau des données de lactation -->
+                        <div class="table-responsive mt-4">
+                            <h3>Données de Lactation (L/jour)</h3>
+                            <table class="table table-bordered" id="lactationDataTable2">
+                                <thead>
+                                    <tr>
+                                        <th>Type</th>
+                                        <th>1</th><th>2</th><th>3</th><th>4</th>
+                                        <th>5</th><th>6</th><th>7</th><th>8</th>
+                                        <th>9</th><th>10</th><th>11</th><th>12</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr id="lactationVache2">
+                                        <td>Vache</td>
+                                        <td>0</td><td>0</td><td>0</td><td>0</td>
+                                        <td>0</td><td>0</td><td>0</td><td>0</td>
+                                        <td>0</td><td>0</td><td>0</td><td>0</td>
+                                    </tr>
+                                    <tr id="lactationGenisse2">
+                                        <td>Génisse</td>
+                                        <td>0</td><td>0</td><td>0</td><td>0</td>
+                                        <td>0</td><td>0</td><td>0</td><td>0</td>
+                                        <td>0</td><td>0</td><td>0</td><td>0</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Répartition des vêlages -->
+                        <div class="table-responsive mt-4">
+                            <h3>Répartition des Vêlages</h3>
+                            <p class="text-muted" id="repartitionInfo2">Veuillez répartir les vêlages selon le taux de renouvellement.</p>
+                            <table class="table table-bordered" id="velageTable2">
+                                <thead>
+                                    <tr>
+                                        <th>Mois</th>
+                                        <th>1</th><th>2</th><th>3</th><th>4</th>
+                                        <th>5</th><th>6</th><th>7</th><th>8</th>
+                                        <th>9</th><th>10</th><th>11</th><th>12</th>
+                                        <th>Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr id="vaches2">
+                                        <td>Vaches</td>
+                                        <td contenteditable="true">0</td>
+                                        <td contenteditable="true">0</td>
+                                        <td contenteditable="true">0</td>
+                                        <td contenteditable="true">0</td>
+                                        <td contenteditable="true">0</td>
+                                        <td contenteditable="true">0</td>
+                                        <td contenteditable="true">0</td>
+                                        <td contenteditable="true">0</td>
+                                        <td contenteditable="true">0</td>
+                                        <td contenteditable="true">0</td>
+                                        <td contenteditable="true">0</td>
+                                        <td contenteditable="true">0</td>
+                                        <td id="totalVaches2">0</td>
+                                    </tr>
+                                    <tr id="genisses2">
+                                        <td>Génisses</td>
+                                        <td contenteditable="true">0</td>
+                                        <td contenteditable="true">0</td>
+                                        <td contenteditable="true">0</td>
+                                        <td contenteditable="true">0</td>
+                                        <td contenteditable="true">0</td>
+                                        <td contenteditable="true">0</td>
+                                        <td contenteditable="true">0</td>
+                                        <td contenteditable="true">0</td>
+                                        <td contenteditable="true">0</td>
+                                        <td contenteditable="true">0</td>
+                                        <td contenteditable="true">0</td>
+                                        <td contenteditable="true">0</td>
+                                        <td id="totalGenisses2">0</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Courbe de production globale -->
+                        <div class="chart-container mt-4">
+                            <canvas id="globalProductionChart2"></canvas>
+                        </div>
+
+                        <!-- Production mensuelle -->
+                        <div class="table-responsive mt-4">
+                            <h3>Production Mensuelle (milliers de L)</h3>
+                            <table class="table table-bordered" id="productionTable2">
+                                <thead>
+                                    <tr>
+                                        <th>Mois</th>
+                                        <th>1</th><th>2</th><th>3</th><th>4</th>
+                                        <th>5</th><th>6</th><th>7</th><th>8</th>
+                                        <th>9</th><th>10</th><th>11</th><th>12</th>
+                                        <th>Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr id="litres2">
+                                        <td>Litres</td>
+                                        <td>0</td><td>0</td><td>0</td><td>0</td>
+                                        <td>0</td><td>0</td><td>0</td><td>0</td>
+                                        <td>0</td><td>0</td><td>0</td><td>0</td>
+                                        <td id="totalLitres2">0</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Prix du lait -->
+                        <div class="table-responsive mt-4">
+                            <h3>Prix du Lait (€/1000L)</h3>
+                            <table class="table table-bordered" id="priceTable2">
+                                <thead>
+                                    <tr>
+                                        <th>Mois</th>
+                                        <th>1</th><th>2</th><th>3</th><th>4</th>
+                                        <th>5</th><th>6</th><th>7</th><th>8</th>
+                                        <th>9</th><th>10</th><th>11</th><th>12</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr id="prices2">
+                                        <td>Prix</td>
+                                        <td contenteditable="true">400</td>
+                                        <td contenteditable="true">400</td>
+                                        <td contenteditable="true">400</td>
+                                        <td contenteditable="true">400</td>
+                                        <td contenteditable="true">400</td>
+                                        <td contenteditable="true">400</td>
+                                        <td contenteditable="true">400</td>
+                                        <td contenteditable="true">400</td>
+                                        <td contenteditable="true">400</td>
+                                        <td contenteditable="true">400</td>
+                                        <td contenteditable="true">400</td>
+                                        <td contenteditable="true">400</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Chiffre d'affaires -->
+                        <div class="chart-container mt-4">
+                            <canvas id="revenueChart2"></canvas>
+                        </div>
+
+                        <!-- Tableau du chiffre d'affaires -->
+                        <div class="table-responsive mt-4">
+                            <h3>Chiffre d'affaires (k€)</h3>
+                            <table class="table table-bordered" id="revenueTable2">
+                                <thead>
+                                    <tr>
+                                        <th>Mois</th>
+                                        <th>1</th><th>2</th><th>3</th><th>4</th>
+                                        <th>5</th><th>6</th><th>7</th><th>8</th>
+                                        <th>9</th><th>10</th><th>11</th><th>12</th>
+                                        <th>Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr id="revenue2">
+                                        <td>CA</td>
+                                        <td>0</td><td>0</td><td>0</td><td>0</td>
+                                        <td>0</td><td>0</td><td>0</td><td>0</td>
+                                        <td>0</td><td>0</td><td>0</td><td>0</td>
+                                        <td id="totalRevenue2">0</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Profil de production</h5>
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <tbody>
+                                    <tr>
+                                        <td>Profil de production</td>
+                                        <td id="profilProduction1">Nourrir pour produire</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Profil de production</h5>
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <tbody>
+                                    <tr>
+                                        <td>Profil de production</td>
+                                        <td id="profilProduction2">Nourrir pour produire</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="script.js"></script>
+</body>
+</html> 
